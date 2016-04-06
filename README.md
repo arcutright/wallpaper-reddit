@@ -1,11 +1,16 @@
 #About
 wallpaper-reddit is a Python 3 program that sets your wallpaper to the top image of one or multiple subreddits.  Version 2 has introduced meny changes, such as the removal of all external dependencies, automatic DE detection for wallpaper setting, and proper setup using setuptools.
 
-warning: this is a modified/extended version, contact https://bitbucket.org/countcutright/ for details
+**Warning: this is a modified/extended version of the original** by https://bitbucket.org/countcutright/
+Details of the original project can be found at https://github.com/markubiak/wallpaper-reddit/
+
+#Changes from original
+- changed behavior so --random flag picks a random image from a random subreddit
+- added config flags for randomsub (choose random subreddit), randomlink (choose random image)
+- added --repeat N flag so that the command can be repeated without need for bash commands
+- changed default behavior under XFCE to be more VM-friendly
 
 #Installation
-Packages for Windows and various Linux distributions can be found on the [Releases pages] (https://github.com/markubiak/wallpaper-reddit/releases)  
-[AUR Link](https://aur.archlinux.org/packages/wallpaper-reddit-git/)  
 From Source:  
 * Install Pillow 3.x or the libraries necessary to compile it from scratch if the distribution you're using does not package it:  
   - Ubuntu/Linux Mint/ElementaryOS: `sudo apt-get install python3-dev python3-setuptools libjpeg8-dev zlib1g-dev libfreetype6-dev`  
@@ -54,4 +59,4 @@ Because more information is always better, much more than the wallpaper itself e
 - external.sh is a bash script that is run at the end of every execution of the script (Linux only).  Any extra commands to deal with the wallpaper can be safely placed in this bash script.  I personally have mine darken my xfce4-panel if the wallpaper is too bright at the top, and set the wallpaper as my SLiM/xscreensaver background.
 
 #Contact
-If there is an issue with the program, please file a github issue.  If you need more specific help troubleshooting a specific desktop or have an issue that isn't worthy of github, feel free to reach out to me on Reddit: [/u/MarcusTheGreat7](https://www.reddit.com/u/MarcusTheGreat7)
+If there is an issue with the program, please file a bitbucket issue.  It doesn't matter how small, if I have free time, I will try to repair it. Please provide as much information as you can (OS, window manager, etc).
