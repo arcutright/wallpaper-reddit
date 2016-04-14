@@ -26,7 +26,8 @@ resize = False
 settitle = False
 randomsub = True
 randomlink = False
-repeat = 1
+massdownload = 0
+repeat = 0
 blacklistcurrent = False
 setcmd = ''
 walldir = ''
@@ -153,11 +154,14 @@ def parse_args():
     parser.add_argument("--repeat", nargs="?", const=1, type=int,
                         help="repeat command N times")
     parser.add_argument("--settitle", help="write title over the image", action="store_true")
+    parser.add_argument("-m --massdownload", nargs="?", const=1, type=int,
+                        help="download mode only. use this to download N links from each subreddit chosen")
     args = parser.parse_args()
     global subs
     global verbose
     global save
     global autosave
+    global massdownload
     global force_dl
     global startup
     global resize
@@ -172,7 +176,10 @@ def parse_args():
     save = args.save
     startup = args.startup
     force_dl = args.force
-    repeat = args.repeat
+    if args.repeat is not None:
+        repeat = args.repeat
+    if args.massdownload is not None:
+        massdownload = args.massdownload
     if args.autosave:
         autosave = True
     if args.resize:
@@ -184,7 +191,6 @@ def parse_args():
         randomlink = True
     if args.blacklist:
         blacklistcurrent = True
-
 
 # in - string - messages to print
 # takes a string and will print it as output if verbose

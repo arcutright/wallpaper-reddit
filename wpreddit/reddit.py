@@ -14,32 +14,66 @@ from wpreddit import config, connection
 # takes in subreddits, converts them to a reddit json url, and then picks out urls and their titles
 def get_links():
     print("searching for valid images...")
-    if config.randomsub:
-        parsedsubs = pick_random(config.subs)
+    if config.massdownload == 0:
+        if config.randomsub:
+            parsedsubs = pick_random(config.subs)
+        else:
+            parsedsubs = config.subs[0]
+            for sub in config.subs[1:]:
+                parsedsubs = parsedsubs + '+' + sub
+        url = "http://www.reddit.com/r/" + parsedsubs + ".json?limit=" + str(config.maxlinks)
+        config.log("Grabbing json file " + url)
+        uaurl = request.Request(url, headers={
+            'User-Agent': 'wallpaper-reddit python script'})
+        response = request.urlopen(uaurl)
+        content = response.read().decode('utf-8')
+        try:
+            data = json.loads(content)
+        except (AttributeError, ValueError):
+            print('Was redirected from valid Reddit formatting. Likely a router redirect, such as a hotel or airport.'
+                'Exiting...')
+            sys.exit(0)
+        response.close()
+        links = []
+        titles = []
+        for i in data["data"]["children"]:
+            links.append(i["data"]["url"])
+            titles.append(i["data"]["title"])
     else:
-        parsedsubs = config.subs[0]
-        for sub in config.subs[1:]:
-            parsedsubs = parsedsubs + '+' + sub
-    url = "http://www.reddit.com/r/" + parsedsubs + ".json?limit=" + str(config.maxlinks)
-    config.log("Grabbing json file " + url)
-    uaurl = request.Request(url, headers={
-        'User-Agent': 'wallpaper-reddit python script'})
-    response = request.urlopen(uaurl)
-    content = response.read().decode('utf-8')
-    try:
-        data = json.loads(content)
-    except (AttributeError, ValueError):
-        print(
-            'Was redirected from valid Reddit formatting. Likely a router redirect, such as a hotel or airport.'
-            'Exiting...')
-        sys.exit(0)
-    response.close()
-    links = []
-    titles = []
-    for i in data["data"]["children"]:
-        links.append(i["data"]["url"])
-        titles.append(i["data"]["title"])
+        links = []
+        titles = []
+        for sub in config.subs:
+            url = "http://www.reddit.com/r/" + sub + ".json?limit=" + str(config.massdownload)
+            config.log("Grabbing json file " + url)
+            uaurl = request.Request(url, headers={
+                'User-Agent': 'wallpaper-reddit python script'})
+            response = request.urlopen(uaurl)
+            content = response.read().decode('utf-8')
+            try:
+                data = json.loads(content)
+            except (AttributeError, ValueError):
+                print('Was redirected from valid Reddit formatting. Likely a router redirect, such as a hotel or airport.'
+                    'Exiting...')
+                sys.exit(0)
+            response.close()
+            for i in data["data"]["children"]:
+                links.append(i["data"]["url"])
+                titles.append(i["data"]["title"])
     return links, titles
+
+def get_all_valid(links):
+    if len(links) == 0:
+        print("No links were returned from any of those subreddits. Are they valid?")
+        sys.exit(1)
+    valid_links = []
+    for i, link in enumerate(links):
+        if not (link[-4:] == '.png' or link[-4:] == '.jpg' or link[-5:] == '.jpeg'):
+            if re.search('(imgur\.com)(?!/a/)', link):
+                link = link.replace("/gallery", "")
+                link += ".jpg"
+        if connection.connected(link) and check_dimensions(link) and check_blacklist(link):
+            valid_links.append([link, i])
+    return valid_links
 
 
 # in - string[] - list of links to check

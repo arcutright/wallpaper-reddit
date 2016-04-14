@@ -23,23 +23,34 @@ def run():
             sys.exit(1)
         links = reddit.get_links()
         titles = links[1]
-        valid = reddit.choose_valid(links[0])
-        valid_url = valid[0]
-        title = titles[valid[1]]
-        download.download_image(valid_url, title)
-        download.save_info(valid_url, title)
-        wallpaper.set_wallpaper()
-        if config.autosave:
-            wallpaper.save_wallpaper()
-        external_script()
-        # repeats
-        if config.repeat is not None:
-            global runcount
-            runcount += 1
-            if runcount < config.repeat:
-                run()
-            else:
-                runcount = 0
+
+        if config.massdownload is not None and config.massdownload > 0:
+            valid_links = reddit.get_all_valid()
+            for link in valid_links:
+                url = link[0]
+                title = titles[link[1]]
+                download.download_image(url, title)
+                download.save_info(url, title)
+                wallpaper.save_wallpaper()
+            external_script()
+        else:
+            valid = reddit.choose_valid(links[0])
+            valid_url = valid[0]
+            title = titles[valid[1]]
+            download.download_image(valid_url, title)
+            download.save_info(valid_url, title)
+            wallpaper.set_wallpaper()
+            if config.autosave:
+                wallpaper.save_wallpaper()
+            external_script()
+            # repeats
+            if config.repeat is not None:
+                global runcount
+                if runcount < config.repeat:
+                    run()
+                    runcount += 1
+                else:
+                    runcount = 0
     except KeyboardInterrupt:
         sys.exit(1)
 
