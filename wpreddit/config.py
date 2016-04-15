@@ -26,8 +26,8 @@ resize = False
 settitle = False
 randomsub = True
 randomlink = False
-massdownload = 0
 repeat = 0
+massdownload = 0
 blacklistcurrent = False
 setcmd = ''
 walldir = ''
@@ -99,7 +99,8 @@ def parse_config():
         print("You are using an old (pre v3) configuration file.  Please delete your config file at " + confdir +
               " and let the program create a new one.")
         sys.exit(1)
-    subs = config.get('Options', 'subs', fallback='earthporn,spaceporn,skyporn,technologyporn,imaginarystarscapes,wallpapers')
+    subs = config.get('Options', 'subs', 
+    	fallback='earthporn,spaceporn,skyporn,technologyporn,imaginarystarscapes,wallpapers')
     subs = [x.strip() for x in subs.split(',')]
     maxlinks = config.getint('Options', 'maxlinks', fallback=20)
     minwidth = config.getint('Options', 'minwidth', fallback=1920)
@@ -130,39 +131,51 @@ def parse_config():
 # parses command-line arguments and stores them to proper global variables
 def parse_args():
     parser = argparse.ArgumentParser(description="Pulls wallpapers from specified subreddits in reddit.com")
-    parser.add_argument("subreddits", help="subreddits to check for wallpapers", nargs="*")
-    parser.add_argument("-v", "--verbose", help="increases program verbosity", action="store_true")
+    parser.add_argument("subreddits", 
+    					nargs="*",
+    					help="subreddits to check for wallpapers")
+    parser.add_argument("-v", "--verbose", 
+    					help="increases program verbosity", 
+    					action="store_true")
     parser.add_argument("-f", "--force",
                         help="forces wallpapers to re-download even if it has the same url as the current wallpaper",
                         action="store_true")
-    parser.add_argument("--startup", help="runs the program as a startup application, waiting on internet connection",
+    parser.add_argument("--startup", 
+    					help="runs the program as a startup application, waiting on internet connection",
                         action="store_true")
+    parser.add_argument("--settitle", 
+    					help="write title over the image", 
+    					action="store_true")
     parser.add_argument("--save",
                         help='saves the current wallpaper (does not download a wallpaper)',
                         action="store_true")
     parser.add_argument("-a", "--autosave",
                         help='downloads a new wallpaper and saves it',
                         action="store_true")
-    parser.add_argument("--resize", help="resizes the image to the height and width specified in the config after "
-                                         "wallpaper is set.  Enabled by default in the configuration file,",
+    parser.add_argument("--resize", 
+    					help="resizes the image to the height and width specified in the config after "+
+                             "wallpaper is set. Enabled by default in the configuration file",
                         action="store_true")
-    parser.add_argument("--blacklist", help="blacklists the current wallpaper and downloads a new wallpaper",
+    parser.add_argument("--blacklist", 
+    					help="blacklists the current wallpaper and downloads a new wallpaper",
                         action="store_true")
     parser.add_argument("-r", "--random",
                         help="will pick a random subreddit and random link from the ones provided instead of turning them into a multireddit",
                         action="store_true")
-    parser.add_argument("--repeat", nargs="?", const=1, type=int,
+    parser.add_argument("--repeat", 
+    					nargs="?", const=1, type=int,
                         help="repeat command N times")
-    parser.add_argument("--settitle", help="write title over the image", action="store_true")
-    parser.add_argument("-m --massdownload", nargs="?", const=1, type=int,
+    parser.add_argument("-m", "--massdownload", 
+    					nargs="?", const=1, type=int,
                         help="download mode only. use this to download N links from each subreddit chosen")
+    
     args = parser.parse_args()
     global subs
     global verbose
     global save
     global autosave
-    global massdownload
     global force_dl
+    global massdownload
     global startup
     global resize
     global settitle

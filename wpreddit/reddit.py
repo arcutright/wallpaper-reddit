@@ -8,13 +8,12 @@ from urllib import request
 
 from wpreddit import config, connection
 
-
 # in - string[] - list of subreddits to get links from
 # out - string[], string[] - a list of links from the subreddits and their respective titles
 # takes in subreddits, converts them to a reddit json url, and then picks out urls and their titles
 def get_links():
     print("searching for valid images...")
-    if config.massdownload == 0:
+    if config.massdownload is None or config.massdownload == 0:
         if config.randomsub:
             parsedsubs = pick_random(config.subs)
         else:
@@ -23,8 +22,7 @@ def get_links():
                 parsedsubs = parsedsubs + '+' + sub
         url = "http://www.reddit.com/r/" + parsedsubs + ".json?limit=" + str(config.maxlinks)
         config.log("Grabbing json file " + url)
-        uaurl = request.Request(url, headers={
-            'User-Agent': 'wallpaper-reddit python script'})
+        uaurl = request.Request(url, headers={'User-Agent': 'wallpaper-reddit python script'})
         response = request.urlopen(uaurl)
         content = response.read().decode('utf-8')
         try:
@@ -43,10 +41,10 @@ def get_links():
         links = []
         titles = []
         for sub in config.subs:
-            url = "http://www.reddit.com/r/" + sub + ".json?limit=" + str(config.massdownload)
+            # grabbing lots of extra links because many do not resolve
+            url = "http://www.reddit.com/r/" + sub + ".json?limit=" + str(int(1.5*config.massdownload + 0.5))
             config.log("Grabbing json file " + url)
-            uaurl = request.Request(url, headers={
-                'User-Agent': 'wallpaper-reddit python script'})
+            uaurl = request.Request(url, headers={'User-Agent': 'wallpaper-reddit python script'})
             response = request.urlopen(uaurl)
             content = response.read().decode('utf-8')
             try:
@@ -61,12 +59,16 @@ def get_links():
                 titles.append(i["data"]["title"])
     return links, titles
 
-def get_all_valid(links):
+def choose_valid(links, numLinks = -1):
     if len(links) == 0:
         print("No links were returned from any of those subreddits. Are they valid?")
         sys.exit(1)
+    if numLinks == -1:
+        numLinks = len(links)
     valid_links = []
     for i, link in enumerate(links):
+        if len(valid_links) > numLinks:
+            break
         if not (link[-4:] == '.png' or link[-4:] == '.jpg' or link[-5:] == '.jpeg'):
             if re.search('(imgur\.com)(?!/a/)', link):
                 link = link.replace("/gallery", "")
@@ -75,12 +77,11 @@ def get_all_valid(links):
             valid_links.append([link, i])
     return valid_links
 
-
 # in - string[] - list of links to check
 # out - string, int - first link to match all criteria and its index (for matching it with a title)
 # takes in a list of links and attempts to find the first one that is a direct image link,
 # is within the proper dimensions, and is not blacklisted
-def choose_valid(links):
+def choose_first_valid(links):
     if len(links) == 0:
         print("No links were returned from any of those subreddits. Are they valid?")
         sys.exit(1)
@@ -117,7 +118,6 @@ def choose_valid(links):
     print("No valid links were found from any of those subreddits.  Try increasing the maxlink parameter.")
     sys.exit(0)
 
-
 # in - string - link to check dimensions of
 # out - boolean - if the link fits the proper dimensions
 # takes a link and checks to see if the link will match the minimum dimensions
@@ -130,12 +130,11 @@ def check_dimensions(url):
         with Image.open(resp) as img:
             dimensions = img.size
             if dimensions[0] >= config.minwidth and dimensions[1] >= config.minheight:
-                config.log("Size checks out")
+                config.log("Size checks out for: " + url)
                 return True
     except IOError:
-        config.log("Image dimensions could not be read")
+        config.log("Image dimensions could not be read: " + url)
     return False
-
 
 # in: a list of subreddits
 # out: the name of a random subreddit
@@ -143,7 +142,6 @@ def check_dimensions(url):
 def pick_random(subreddits):
     rand = random.randint(0, len(subreddits) - 1)
     return subreddits[rand]
-
 
 # in - string - a url to match against the blacklist
 # out - boolean - whether the url is blacklisted
@@ -155,7 +153,6 @@ def check_blacklist(url):
         if link == url:
             return False
     return True
-
 
 # blacklists the current wallpaper, as listed in the ~/.wallpaper/url.txt file
 def blacklist_current():

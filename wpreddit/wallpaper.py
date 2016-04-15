@@ -7,14 +7,12 @@ import sys
 
 from wpreddit import config
 
-
 def set_wallpaper():
     if config.opsys == "Windows":
         ctypes.windll.user32.SystemParametersInfoW(0x14, 0, config.walldir + "\\wallpaper.bmp", 0x3)
     else:
         linux_wallpaper()
     print("wallpaper set command was run")
-
 
 def linux_wallpaper():
     de = os.environ.get('DESKTOP_SESSION')
@@ -49,7 +47,6 @@ def linux_wallpaper():
             sys.exit(1)
         else:
             os.system(config.setcmd)
-
 
 # saves the wallpaper in the save directory from the config
 # naming scheme is wallpaperN

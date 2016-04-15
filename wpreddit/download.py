@@ -1,10 +1,10 @@
 import re
 import sys
+import os
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from urllib import request
 
 from wpreddit import config
-
 
 # credit: http://www.techniqal.com/blog/2011/01/18/python-3-file-read-write-with-urllib/
 # in - string - direct url of the image to download
@@ -29,7 +29,49 @@ def download_image(url, title):
         print("Error saving image!")
         sys.exit(1)
 
-
+def download_image_and_save(url, title):
+    uaurl = request.Request(url, headers={'User-Agent': 'wallpaper-reddit python script'})
+    f = request.urlopen(uaurl)
+    print("downloading " + url)
+    try:
+        # resize image if needed
+        img = Image.open(f)
+        if config.resize:
+            config.log("resizing the downloaded wallpaper")
+            img = ImageOps.fit(img, (config.minwidth, config.minheight), Image.ANTIALIAS)
+        if config.settitle:
+            img = set_image_title(img, title)
+        # create save path if needed
+        if not os.path.exists(config.savedir):
+            os.makedirs(config.savedir)
+            config.log(config.savedir + " created")
+        if not os.path.isfile(config.savedir + '/titles.txt'):
+            with open(config.savedir + '/titles.txt', 'w') as f:
+                f.write('Titles of the saved wallpapers:')
+            config.log(config.savedir + "/titles.txt created")
+        wpcount = 0
+        path = ''
+        # count images in dir, save as 'wallpaper' n+1
+        if config.opsys == "Windows":
+            path = config.savedir + ('\\wallpaper.bmp')
+            while os.path.isfile(config.savedir + '\\wallpaper' + str(wpcount) + '.bmp'):
+                wpcount += 1
+            path = config.savedir + ('\\wallpaper' + str(wpcount) + '.bmp')
+            img.save(path, 'BMP')
+        else:
+            path = config.savedir + ('/wallpaper.jpg')
+            while os.path.isfile(config.savedir + '/wallpaper' + str(wpcount) + '.jpg'):
+                wpcount += 1
+            path = config.savedir + ('/wallpaper'  + str(wpcount) + '.jpg')
+            img.save(path, 'JPEG')
+        # write title of image to titles logging file
+        with open(config.savedir + '/titles.txt', 'a') as f:
+            f.write('\n' + 'wallpaper' + str(wpcount) + ': ' + title)
+        print("\tSaved as \'wallpaper" + str(wpcount) + "\'")
+    except IOError:
+        print("Error saving image!")
+        sys.exit(1)
+    
 # in - string, string - path of the image to set title on, title for image
 def set_image_title(img, title):
     config.log("setting title")
