@@ -12,7 +12,7 @@ from wpreddit import config
 # downloads the specified image and saves it to disk
 def download_image(url, title):
     uaurl = request.Request(url, headers={'User-Agent': 'wallpaper-reddit python script'})
-    f = request.urlopen(uaurl)
+    f = request.urlopen(uaurl, timeout=3)
     print("downloading " + url)
     try:
         img = Image.open(f)
@@ -31,11 +31,11 @@ def download_image(url, title):
 
 def download_image_and_save(url, title):
     uaurl = request.Request(url, headers={'User-Agent': 'wallpaper-reddit python script'})
-    f = request.urlopen(uaurl)
+    f = request.urlopen(uaurl, timeout=3)
     print("downloading " + url)
     try:
-        # resize image if needed
         img = Image.open(f)
+        # resize image if needed
         if config.resize:
             config.log("resizing the downloaded wallpaper")
             img = ImageOps.fit(img, (config.minwidth, config.minheight), Image.ANTIALIAS)
@@ -67,10 +67,11 @@ def download_image_and_save(url, title):
         # write title of image to titles logging file
         with open(config.savedir + '/titles.txt', 'a') as f:
             f.write('\n' + 'wallpaper' + str(wpcount) + ': ' + title)
-        print("\tSaved as \'wallpaper" + str(wpcount) + "\'")
+        print("Saved as \'wallpaper" + str(wpcount) + "\'")
+        return True
     except IOError:
         print("Error saving image!")
-        sys.exit(1)
+    return False
     
 # in - string, string - path of the image to set title on, title for image
 def set_image_title(img, title):

@@ -21,19 +21,13 @@ def run():
         if not connection.connected("http://www.reddit.com"):
             print("ERROR: You do not appear to be connected to Reddit. Exiting")
             sys.exit(1)
-        links = reddit.get_links()
-        titles = links[1]
         # mass download mode
         if config.massdownload is not None and config.massdownload > 0:
-            # pls fix me to grab by sub, not first n valid links across all subs
-            valid_links = reddit.choose_valid(links[0], config.massdownload * len(config.subs))
-            for link in valid_links:
-                url = link[0]
-                title = titles[link[1]]
-                download.download_image_and_save(url, title)
-            external_script()
+            reddit.mass_download()
         # normal operation (meant for cron jobs and such)
         else:
+            links = reddit.get_links()
+            titles = links[1]
             valid = reddit.choose_first_valid(links[0])
             valid_url = valid[0]
             title = titles[valid[1]]

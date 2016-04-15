@@ -13,8 +13,7 @@ from wpreddit import config
 # checks whether the program can connect to the specified url
 def connected(url):
     try:
-        uaurl = urllib.request.Request(url, 
-            headers={'User-Agent': 'wallpaper-reddit python script'})
+        uaurl = urllib.request.Request(url, headers={'User-Agent': 'wallpaper-reddit python script'})
         url = urllib.request.urlopen(uaurl, timeout=3)
         url.close()
         return True
@@ -27,8 +26,7 @@ def connected(url):
 def check_not_redirected():
     try:
         # Not reloading /etc/resolv.conf, since it will have to be reloaded for the function right before this is called
-        uaurl = urllib.request.Request('http://www.reddit.com/.json',
-                                       headers={'User-Agent': 'wallpaper-reddit python script'})
+        uaurl = urllib.request.Request('http://www.reddit.com/.json', headers={'User-Agent': 'wallpaper-reddit python script'})
         url = urllib.request.urlopen(uaurl, timeout=3)
         json.loads(url.read().decode('utf8'))
         url.close()

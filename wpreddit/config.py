@@ -28,6 +28,7 @@ randomsub = True
 randomlink = False
 repeat = 0
 massdownload = 0
+threads = 1
 blacklistcurrent = False
 setcmd = ''
 walldir = ''
@@ -163,12 +164,14 @@ def parse_args():
                         help="will pick a random subreddit and random link from the ones provided instead of turning them into a multireddit",
                         action="store_true")
     parser.add_argument("--repeat", 
-    					nargs="?", const=1, type=int,
+    					nargs="?", const=1, type=int, metavar='N',
                         help="repeat command N times")
     parser.add_argument("-m", "--massdownload", 
-    					nargs="?", const=1, type=int,
-                        help="download mode only. use this to download N links from each subreddit chosen")
-    
+    					nargs="?", const=1, type=int, metavar='N',
+                        help="download mode only. Download N links from each subreddit chosen")
+    parser.add_argument("-t", "--threads", 
+    					nargs="?", const=1, type=int, metavar='N',
+                        help="for mass download mode only. Distributes the download(s) across N threads")
     args = parser.parse_args()
     global subs
     global verbose
@@ -176,6 +179,7 @@ def parse_args():
     global autosave
     global force_dl
     global massdownload
+    global threads
     global startup
     global resize
     global settitle
@@ -193,6 +197,8 @@ def parse_args():
         repeat = args.repeat
     if args.massdownload is not None:
         massdownload = args.massdownload
+    if args.threads is not None:
+        threads = args.threads
     if args.autosave:
         autosave = True
     if args.resize:
