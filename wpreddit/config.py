@@ -16,6 +16,7 @@ autosave = False
 subs = []
 minwidth = 0
 minheight = 0
+ignoreSourceDimensions = False
 titlesize = 0
 titlealign_x = ""
 titlealign_y = ""
@@ -82,6 +83,7 @@ def parse_config():
     global maxlinks
     global minheight
     global minwidth
+    global ignoreSourceDimensions
     global settitle
     global titlesize
     global titlealign_x
@@ -106,6 +108,7 @@ def parse_config():
     maxlinks = config.getint('Options', 'maxlinks', fallback=20)
     minwidth = config.getint('Options', 'minwidth', fallback=1920)
     minheight = config.getint('Options', 'minheight', fallback=1080)
+    ignoreSourceDimensions = config.getboolean('Options', 'ignoreSourceDimensions', fallback=False)
     resize = config.getboolean('Options', 'resize', fallback=True)
     randomsub = config.getboolean('Options', 'randomsub', fallback=True)
     randomlink = config.getboolean('Options', 'randomlink', fallback=False)
@@ -169,6 +172,9 @@ def parse_args():
     parser.add_argument("-m", "--massdownload", 
     					nargs="?", const=1, type=int, metavar='N',
                         help="download mode only. Download N links from each subreddit chosen")
+    parser.add_argument("-i", "--ignoreSourceDimensions", 
+                        help="downloads all images it finds, instead of only those that match min height/width in config",
+                        action='store_true')
     parser.add_argument("-t", "--threads", 
     					nargs="?", const=1, type=int, metavar='N',
                         help="for mass download mode only. Distributes the download(s) across N threads")
@@ -179,6 +185,7 @@ def parse_args():
     global autosave
     global force_dl
     global massdownload
+    global ignoreSourceDimensions
     global threads
     global startup
     global resize
@@ -197,6 +204,8 @@ def parse_args():
         repeat = args.repeat
     if args.massdownload is not None:
         massdownload = args.massdownload
+    if args.ignoreSourceDimensions:
+        ignoreSourceDimensions = True
     if args.threads is not None:
         threads = args.threads
     if args.autosave:

@@ -4,7 +4,7 @@ import random
 import re
 import sys
 from PIL import Image
-from urllib import request
+from urllib import request, parse
 from multiprocessing.dummy import Pool as ThreadPool
 
 from wpreddit import config, connection, download
@@ -58,14 +58,13 @@ def download_from_sub(sub):
     # grabbing lots of extra links because many do not resolve
     url = "http://www.reddit.com/r/" + sub + ".json?limit=" + str(2*config.massdownload)
     print("Grabbing json file " + url)
-    uaurl = request.Request(url, headers={'User-Agent': 'wallpaper-reddit python script'})
-    response = request.urlopen(uaurl, timeout=3)
-    content = response.read().decode('utf-8')
     try:
+        uaurl = request.Request(url, headers={'User-Agent': 'wallpaper-reddit python script'})
+        response = request.urlopen(uaurl, timeout=3)
+        content = response.read().decode('utf-8')
         data = json.loads(content)
-    except (AttributeError, ValueError):
-        print('Was redirected from valid Reddit formatting. Likely a router redirect, such as a hotel or airport.'
-            'Exiting...')
+    except:
+        print('Error: could not get json file')
         return False
     response.close()
     try:
@@ -74,7 +73,8 @@ def download_from_sub(sub):
         for i in data["data"]["children"]:
             if(numValid >= config.massdownload):
                 break
-            link = i["data"]["url"]
+            res = parse.urlparse(i["data"]["url"])
+            link = res.scheme + '://' + res.netloc + res.path
             title = i["data"]["title"]
             try:
                 if is_valid_link(link) and download.download_image_and_save(link, title):
@@ -103,14 +103,46 @@ def choose_valid(links, numLinks = -1):
     return valid_links
     
 def is_valid_link(link):
-    if not (link[-4:] == '.png' or link[-4:] == '.jpg' or link[-5:] == '.jpeg'):
+    res = parse.urlparse(link)
+    link = res.scheme + '://' + res.netloc + res.path
+    config.log('checking ' + link)
+    # check if it's in the blacklist
+    if not check_blacklist(link): 
+        return False
+    # link fix for imgur
+    if not (link[-4:] == '.png' or link[-4:] == '.jpg' or link[-5:] == '.jpeg' or link[-4:] == '.gif'):
         if re.search('(imgur\.com)(?!/a/)', link):
             link = link.replace("/gallery", "")
             link += ".jpg"
-    if connection.connected(link) and check_dimensions(link) and check_blacklist(link):
-        return True
-    else:
-        return False
+    try:
+        # check content type from headers
+        uaurl = request.Request(link, headers={'User-Agent': 'wallpaper-reddit python script',
+            'Range': 'bytes=0-16384'})
+        response = request.urlopen(uaurl, timeout=10)
+        contenttype = response.headers['Content-Type'].split(';')[0].lower()
+        if contenttype not in ('image/png', 'image/jpeg', 'image/jpg', 'image/gif'):
+            config.log('Error: url is not an image: ' + link)
+            # add logic to find image on page
+            return False
+        # check dimensions of image
+        try:
+            img = Image.open(response)
+            if config.ignoreSourceDimensions:
+                config.log('image ok')
+                return True
+            else:
+                dimensions = img.size
+                if dimensions[0] >= config.minwidth and dimensions[1] >= config.minheight:
+                    config.log('image ok')
+                    return True
+                else:
+                    config.log('image too small')
+        except:
+            config.log('Error: could not open as image: ' + link)
+            config.log(str(response.status) + ' ' + str(response.reason))
+    except:
+        config.log('Error: no response from url: ' + link)
+    return False
 
 # in - string[] - list of links to check
 # out - string, int - first link to match all criteria and its index (for matching it with a title)
@@ -152,22 +184,6 @@ def choose_first_valid(links):
             return link, i
     print("No valid links were found from any of those subreddits.  Try increasing the maxlink parameter.")
     sys.exit(0)
-
-# in - string - link to check dimensions of
-# out - boolean - if the link fits the proper dimensions
-# takes a link and checks to see if the link will match the minimum dimensions
-def check_dimensions(url):
-    resp = request.urlopen(request.Request(url, headers={'User-Agent': 'wallpaper-reddit python script',
-       'Range': 'bytes=0-16384'}), timeout=3)
-    try:
-        with Image.open(resp) as img:
-            dimensions = img.size
-            if dimensions[0] >= config.minwidth and dimensions[1] >= config.minheight:
-                config.log("Size checks out for: " + url)
-                return True
-    except IOError:
-        config.log("Image dimensions could not be read: " + url)
-    return False
 
 # in: a list of subreddits
 # out: the name of a random subreddit

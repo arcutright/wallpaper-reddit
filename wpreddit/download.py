@@ -2,7 +2,7 @@ import re
 import sys
 import os
 from PIL import Image, ImageDraw, ImageFont, ImageOps
-from urllib import request
+from urllib import request, parse
 
 from wpreddit import config
 
@@ -12,7 +12,7 @@ from wpreddit import config
 # downloads the specified image and saves it to disk
 def download_image(url, title):
     uaurl = request.Request(url, headers={'User-Agent': 'wallpaper-reddit python script'})
-    f = request.urlopen(uaurl, timeout=3)
+    f = request.urlopen(uaurl, timeout=10)
     print("downloading " + url)
     try:
         img = Image.open(f)
@@ -30,11 +30,24 @@ def download_image(url, title):
         sys.exit(1)
 
 def download_image_and_save(url, title):
-    uaurl = request.Request(url, headers={'User-Agent': 'wallpaper-reddit python script'})
-    f = request.urlopen(uaurl, timeout=3)
-    print("downloading " + url)
+    #remove any queries or hashes from the url
+    res = parse.urlparse(url)
+    url = res.scheme + '://' + res.netloc + res.path
+    config.log("downloading " + url)
+    try:
+        uaurl = request.Request(url, headers={'User-Agent': 'wallpaper-reddit python script'})
+        f = request.urlopen(uaurl, timeout=10)
+    except:
+        config.log('Error downloading image')
+        config.log(str(f.status) + ' ' + str(f.reason))
+        return False
     try:
         img = Image.open(f)
+    except:
+        config.log('Error opening as image')
+        config.log(str(f.status) + ' ' + str(f.reason))
+        return False
+    try:
         # resize image if needed
         if config.resize:
             config.log("resizing the downloaded wallpaper")
@@ -67,10 +80,10 @@ def download_image_and_save(url, title):
         # write title of image to titles logging file
         with open(config.savedir + '/titles.txt', 'a') as f:
             f.write('\n' + 'wallpaper' + str(wpcount) + ': ' + title)
-        print("Saved as \'wallpaper" + str(wpcount) + "\'")
+        config.log("Saved as \'wallpaper" + str(wpcount) + "\'")
         return True
     except IOError:
-        print("Error saving image!")
+        config.log("Error saving image")
     return False
     
 # in - string, string - path of the image to set title on, title for image
