@@ -1,14 +1,16 @@
 #About
-wallpaper-reddit is a Python 3 program that sets your wallpaper to the top image of one or multiple subreddits.  Version 2 has introduced meny changes, such as the removal of all external dependencies, automatic DE detection for wallpaper setting, and proper setup using setuptools.
+**Warning**: this is a fork of https://github.com/markubiak/wallpaper-reddit/
 
-**Warning: this is a modified/extended version of the original** by https://bitbucket.org/countcutright/
-Details of the original project can be found at https://github.com/markubiak/wallpaper-reddit/
+wallpaper-reddit is a Python 3 program that sets your wallpaper to the top image (or random image) of one or multiple subreddits, configurable in the config file. It can also be used as a mass download tool to automate the collection of images from subreddits using the -m flag, can resize downloaded images automatically, and can filter what images to download based on their dimensions. There are many options and a lot of customization is available, check the config file or --help for more information.
+
 
 #Changes from original
+- changed default behavior under XFCE to be more VM-friendly
 - changed behavior so --random flag picks a random image from a random subreddit
 - added config flags for randomsub (choose random subreddit), randomlink (choose random image)
 - added --repeat N flag so that the command can be repeated without need for bash commands
-- changed default behavior under XFCE to be more VM-friendly
+- added -m N "mass download" flag to facilitate image farming (N per subreddit)
+- added -i "ignore size" flag so that the user can choose to download all images available with -m
 
 #Installation
 From Source:  
@@ -36,6 +38,7 @@ Config Options:
 - resize does the same thing as the --resize flag.  It is enabled by default.
 - randomsub will choose a random subreddit from the list of subreddits. It is enabled by default.
 - randomlink will choose a random link from the subreddit's json file. It is disabled by default.
+There are probably some I've forgotten, use reddit wallpaper -h or --help for a full listing
 
 #Startup
 If wallpaper-reddit is run with the --startup flag, the program will wait on an internet connection.  Options for the startup can only be set in the config file.  They are under the [Startup] section: interval and attempts.  The script will try to make a connection to reddit.com up to $attempts times at every $interval seconds.  For example, the default setting is an interval of 3 and 10 attempts, so the script will try to connect to reddit every 3 seconds for up to 10 tries, giving a total of 30 seconds before the scrpit gives up.  As a reminder, this feature is only activated by the --startup flag
