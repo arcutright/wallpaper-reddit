@@ -11,7 +11,8 @@
 - added `--repeat [N]` flag so that the command can be repeated without need for bash commands
 - added `-m [N]` "mass download" flag to facilitate image farming (N per subreddit)
 - added `-i` "ignore size" flag so that the user can choose to download all images available with `-m`
-- many other things, such as threading with `-t [N]`, etc. Check `--help` for a full listing of commands
+
+many other things, such as threading with `-t [N]`, etc. Check `--help` for a full listing of commands
 
 #Installation
 Dependencies:
@@ -47,6 +48,7 @@ Config Options:
 - `resize` does the same thing as the `--resize` flag.  It is enabled by default.
 - `randomsub` will choose a random subreddit from the list of subreddits. It is enabled by default.
 - `randomlink` will choose a random link from the subreddit's json file. It is disabled by default.
+
 There are probably some I've forgotten, check `reddit-wallpaper -h` or `--help` for a full listing
 
 #Startup
