@@ -165,7 +165,7 @@ def choose_first_valid(links):
                 link += ".jpg"
             else:
                 continue
-        if not (connection.connected(link) and check_dimensions(link) and check_blacklist(link)):
+        if not is_valid_link(link):
             continue
 
         def not_same_url(link):
