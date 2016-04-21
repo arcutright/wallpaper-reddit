@@ -14,19 +14,21 @@ wallpaper-reddit is a Python 3 program that sets your wallpaper to the top image
 
 #Installation
 From Source:  
-* Install Pillow 3.x or the libraries necessary to compile it from scratch if the distribution you're using does not package it:  
+* Dependencies: 
+  - python3, python-pillow, python-setuptools
+* Install Pillow 3.x and/or the libraries necessary to compile it from scratch if the distribution you're using does not package it:  
   - Ubuntu/Linux Mint/ElementaryOS: `sudo apt-get install python3-dev python3-setuptools libjpeg8-dev zlib1g-dev libfreetype6-dev`  
   - Fedora: `sudo dnf install python3-imaging` (installed by default)  
-  - Arch: `sudo pacman -S python-pillow`  
+  - Arch: `sudo pacman -S python-pillow python-setuptools`  
 * Clone the repository and navigate into the directory with the setup.py file.  
 * Run `sudo python3 setup.py install`  
 
 #Usage
 The script is very simple to use.  Simply type:
 
-  wallpaper-reddit [subreddits]
+  wallpaper-reddit [subreddits] [flags]
   
-If no subreddits are specified, the script will default to the top image from the subs section of the config file.  There are many, many more options, all of which you can see by typing:
+If no arguments are specified, the script will default to the top image from a random subreddit (defined in the subs section of the config file, there are several subs by default).  There are many, many more options, all of which you can see by typing:
 
   wallpaper-reddit --help
 
