@@ -1,7 +1,7 @@
 #About
 **Warning**: this is a fork of https://github.com/markubiak/wallpaper-reddit/
 
-wallpaper-reddit is a Python 3 program that sets your wallpaper to the top image (or random image) of one or multiple subreddits, configurable in the config file. It can also be used as a mass download tool to automate the collection of images from subreddits using the `-m` flag, can resize downloaded images automatically, and can filter what images to download based on their dimensions. There are many options and a lot of customization is available, check the config file or `--help` for more information.
+`wallpaper-reddit` is a Python 3 program that sets your wallpaper to the top image (or random image) of one or multiple subreddits, configurable in the config file. It can also be used as a mass download tool to automate the collection of images from subreddits using the `-m` flag, can resize downloaded images automatically, and can filter what images to download based on their dimensions. There are many options and a lot of customization is available, check the config file or `--help` for more information.
 
 
 #Changes from original
@@ -14,16 +14,19 @@ wallpaper-reddit is a Python 3 program that sets your wallpaper to the top image
 - many other things, such as threading with `-t [N]`, etc. Check `--help` for a full listing of commands
 
 #Installation
-From Source:  
+Dependencies:
 
-* Dependencies:
-    - python3, python-pillow, python-setuptools
-* Install dependencies if needed:
-    - Ubuntu/Linux Mint/ElementaryOS: `sudo apt-get install python3-dev python3-setuptools libjpeg8-dev zlib1g-dev libfreetype6-dev`  
-    - Fedora: `sudo dnf install python3-imaging` (installed by default)  
-    - Arch: `sudo pacman -S python-pillow python-setuptools`  
-* Clone the repository and navigate into the directory with the setup.py file.  
-* Run `sudo python3 setup.py install`  
+- python3, python-pillow, python-setuptools
+
+Install dependencies if needed:
+
+- Ubuntu/Linux Mint/ElementaryOS: `sudo apt-get install python3-dev python3-setuptools libjpeg8-dev zlib1g-dev libfreetype6-dev`  
+- Fedora: `sudo dnf install python3-imaging` (installed by default)  
+- Arch: `sudo pacman -S python-pillow python-setuptools`  
+
+Clone the repository and navigate into the directory with the setup.py file.  
+
+Run `sudo python3 setup.py install`  
 
 #Usage
 The script is very simple to use.  Simply type:
